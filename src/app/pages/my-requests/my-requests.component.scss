@@ -1,0 +1,36 @@
+.filters {
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.table-card {
+  background: var(--mat-sys-surface);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+}
+
+.type-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.note-cell {
+  max-width: 280px;
+}
+
+.actions-cell {
+  width: 56px;
+  text-align: right;
+}

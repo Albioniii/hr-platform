@@ -1,0 +1,113 @@
+@if (user(); as u) {
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1>{{ greeting() }}, {{ u.firstName }}</h1>
+        <p>Here is an overview of your time off.</p>
+      </div>
+      <a mat-flat-button routerLink="/requests/new">
+        <mat-icon>add</mat-icon>
+        Request leave
+      </a>
+    </header>
+
+    <!-- Kartat me statistika -->
+    <section class="stats">
+      @if (balance(); as b) {
+        <mat-card appearance="outlined" class="stat-card highlight">
+          <div class="stat-top">
+            <span class="stat-label">Annual leave available</span>
+            <mat-icon>beach_access</mat-icon>
+          </div>
+          <div class="stat-value">{{ b.available }} <small>/ {{ b.allowance }} days</small></div>
+          <mat-progress-bar mode="determinate" [value]="usedPercent()" />
+          <span class="stat-hint">{{ b.used }} used · {{ b.pending }} pending approval</span>
+        </mat-card>
+      }
+
+      <mat-card appearance="outlined" class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">My pending requests</span>
+          <mat-icon>hourglass_top</mat-icon>
+        </div>
+        <div class="stat-value">{{ myPendingCount() }}</div>
+        <a class="stat-link" routerLink="/requests">View my requests</a>
+      </mat-card>
+
+      @if (isManager()) {
+        <mat-card appearance="outlined" class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Waiting for my approval</span>
+            <mat-icon>fact_check</mat-icon>
+          </div>
+          <div class="stat-value">{{ teamPendingCount() }}</div>
+          <a class="stat-link" routerLink="/approvals">Review requests</a>
+        </mat-card>
+      }
+
+      <mat-card appearance="outlined" class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Out of office today</span>
+          <mat-icon>flight_takeoff</mat-icon>
+        </div>
+        <div class="stat-value">{{ outTodayCount() }}</div>
+        <a class="stat-link" routerLink="/calendar">Open team calendar</a>
+      </mat-card>
+    </section>
+
+    <section class="columns">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>My upcoming leave</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @for (r of upcoming(); track r.id) {
+            <div class="list-row">
+              <span class="type-icon"><mat-icon>{{ r.type | leaveType: 'icon' }}</mat-icon></span>
+              <div class="list-main">
+                <span class="list-title">{{ r.type | leaveType }}</span>
+                <span class="muted">
+                  {{ r.startDate | date: 'MMM d' }} – {{ r.endDate | date: 'MMM d, y' }} · {{ r.days }}
+                  {{ r.days === 1 ? 'day' : 'days' }}
+                </span>
+              </div>
+              <span class="status status-{{ r.status }}">{{ r.status }}</span>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <mat-icon>wb_sunny</mat-icon>
+              <p>No upcoming leave. Maybe it is time for a break?</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Who is out this week</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @for (item of outThisWeek(); track item.request.id) {
+            @if (item.employee; as e) {
+              <div class="list-row">
+                <app-avatar [employee]="e" [size]="36" />
+                <div class="list-main">
+                  <span class="list-title">{{ e.firstName }} {{ e.lastName }}</span>
+                  <span class="muted">
+                    {{ item.request.type | leaveType }} · {{ item.request.startDate | date: 'EEE, MMM d' }} –
+                    {{ item.request.endDate | date: 'EEE, MMM d' }}
+                  </span>
+                </div>
+              </div>
+            }
+          } @empty {
+            <div class="empty-state">
+              <mat-icon>groups</mat-icon>
+              <p>Everyone is in the office this week.</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </div>
+}

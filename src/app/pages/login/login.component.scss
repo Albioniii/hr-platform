@@ -1,0 +1,125 @@
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  padding: 32px 64px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, var(--mat-sys-primary-container), var(--mat-sys-surface-container-low) 60%);
+}
+
+.intro {
+  max-width: 480px;
+  justify-self: end;
+
+  h1 {
+    font-size: 40px;
+    line-height: 1.15;
+    font-weight: 500;
+    margin: 32px 0 16px;
+  }
+
+  p {
+    font-size: 17px;
+    color: var(--mat-sys-on-surface-variant);
+    margin: 0 0 24px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    mat-icon {
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 8px;
+  background: var(--mat-sys-surface);
+
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  mat-form-field {
+    margin-bottom: 4px;
+  }
+}
+
+.submit {
+  height: 44px;
+  margin-top: 4px;
+}
+
+.demo {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .demo-title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 900px) {
+  .login-page {
+    grid-template-columns: 1fr;
+    padding: 24px 16px;
+    gap: 24px;
+  }
+
+  .intro {
+    justify-self: center;
+
+    h1 {
+      font-size: 28px;
+      margin-top: 16px;
+    }
+
+    ul {
+      display: none;
+    }
+  }
+
+  .login-card {
+    justify-self: center;
+  }
+}

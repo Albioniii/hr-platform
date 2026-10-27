@@ -1,0 +1,94 @@
+<div class="page">
+  @if (employee(); as e) {
+    @if (!isOwnProfile()) {
+      <a mat-button routerLink="/employees" class="back">
+        <mat-icon>arrow_back</mat-icon>
+        All employees
+      </a>
+    }
+
+    <mat-card appearance="outlined" class="profile-header">
+      <app-avatar [employee]="e" [size]="80" />
+      <div class="identity">
+        <h1>{{ e.firstName }} {{ e.lastName }}</h1>
+        <p>{{ e.position }} · {{ e.department }}</p>
+        @if (onLeaveToday()) {
+          <span class="status status-pending">On leave today</span>
+        } @else {
+          <span class="status status-approved">In office</span>
+        }
+      </div>
+    </mat-card>
+
+    <div class="grid">
+      <mat-card appearance="outlined" class="info-card">
+        <h2>Details</h2>
+        <dl>
+          <div>
+            <dt><mat-icon>mail</mat-icon> Email</dt>
+            <dd>{{ e.email }}</dd>
+          </div>
+          <div>
+            <dt><mat-icon>call</mat-icon> Phone</dt>
+            <dd>{{ e.phone }}</dd>
+          </div>
+          <div>
+            <dt><mat-icon>event</mat-icon> Started</dt>
+            <dd>{{ e.startDate | date: 'MMMM d, y' }}</dd>
+          </div>
+          <div>
+            <dt><mat-icon>supervisor_account</mat-icon> Manager</dt>
+            <dd>
+              @if (manager(); as m) {
+                {{ m.firstName }} {{ m.lastName }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </mat-card>
+
+      @if (balance(); as b) {
+        <mat-card appearance="outlined" class="info-card">
+          <h2>Annual leave this year</h2>
+          <div class="balance-big">
+            {{ b.remaining }}<small> / {{ b.allowance }} days left</small>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="usedPercent()" />
+          <div class="balance-row">
+            <span>{{ b.used }} used</span>
+            <span>{{ b.pending }} pending</span>
+            <span>{{ b.available }} available</span>
+          </div>
+        </mat-card>
+      }
+    </div>
+
+    <mat-card appearance="outlined" class="info-card">
+      <h2>Leave history</h2>
+      @for (r of history(); track r.id) {
+        <div class="history-row">
+          <mat-icon class="type-icon">{{ r.type | leaveType: 'icon' }}</mat-icon>
+          <span class="history-type">{{ r.type | leaveType }}</span>
+          <span class="muted history-dates">
+            {{ r.startDate | date: 'MMM d, y' }}
+            @if (r.endDate !== r.startDate) {
+              – {{ r.endDate | date: 'MMM d, y' }}
+            }
+            · {{ r.days }} {{ r.days === 1 ? 'day' : 'days' }}
+          </span>
+          <span class="status status-{{ r.status }}">{{ r.status }}</span>
+        </div>
+      } @empty {
+        <div class="empty-state"><p>No leave taken yet.</p></div>
+      }
+    </mat-card>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>person_off</mat-icon>
+      <p>Employee not found.</p>
+      <a mat-stroked-button routerLink="/employees">Back to employees</a>
+    </div>
+  }
+</div>

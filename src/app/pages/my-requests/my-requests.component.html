@@ -1,0 +1,95 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>My requests</h1>
+      <p>All your leave requests and their status.</p>
+    </div>
+    <a mat-flat-button routerLink="/requests/new">
+      <mat-icon>add</mat-icon>
+      Request leave
+    </a>
+  </header>
+
+  <mat-button-toggle-group
+    class="filters"
+    [value]="filter()"
+    (change)="setFilter($event.value)"
+    aria-label="Filter by status"
+  >
+    <mat-button-toggle value="all">All</mat-button-toggle>
+    <mat-button-toggle value="pending">Pending</mat-button-toggle>
+    <mat-button-toggle value="approved">Approved</mat-button-toggle>
+    <mat-button-toggle value="rejected">Rejected</mat-button-toggle>
+    <mat-button-toggle value="cancelled">Cancelled</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <mat-card appearance="outlined" class="table-card">
+    @if (rows().length > 0) {
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="rows()">
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let r">
+              <span class="type-cell">
+                <mat-icon>{{ r.type | leaveType: 'icon' }}</mat-icon>
+                {{ r.type | leaveType }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="dates">
+            <th mat-header-cell *matHeaderCellDef>Dates</th>
+            <td mat-cell *matCellDef="let r">
+              {{ r.startDate | date: 'MMM d, y' }}
+              @if (r.endDate !== r.startDate) {
+                – {{ r.endDate | date: 'MMM d, y' }}
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="days">
+            <th mat-header-cell *matHeaderCellDef>Days</th>
+            <td mat-cell *matCellDef="let r">{{ r.days }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let r">
+              <span class="status status-{{ r.status }}">{{ r.status }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="note">
+            <th mat-header-cell *matHeaderCellDef>Note</th>
+            <td mat-cell *matCellDef="let r" class="note-cell">
+              @if (r.reviewComment) {
+                <span class="muted">Manager: {{ r.reviewComment }}</span>
+              } @else {
+                <span class="muted">{{ r.reason || '—' }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let r" class="actions-cell">
+              @if (r.status === 'pending') {
+                <button mat-icon-button matTooltip="Cancel request" (click)="cancel(r)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>No requests here yet.</p>
+      </div>
+    }
+  </mat-card>
+</div>

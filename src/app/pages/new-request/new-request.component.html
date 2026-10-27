@@ -1,0 +1,97 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Request leave</h1>
+      <p>Your manager will be notified and can approve or reject the request.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <mat-card appearance="outlined" class="form-card">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <h3>Type of leave</h3>
+        <div class="type-options" role="radiogroup" aria-label="Type of leave">
+          @for (t of leaveTypes; track t.value) {
+            <button
+              type="button"
+              class="type-option"
+              role="radio"
+              [attr.aria-checked]="selectedType() === t.value"
+              [class.selected]="selectedType() === t.value"
+              (click)="form.controls.type.setValue(t.value)"
+            >
+              <mat-icon>{{ t.icon }}</mat-icon>
+              <span>{{ t.label }}</span>
+            </button>
+          }
+        </div>
+
+        <h3>Dates</h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>First and last day</mat-label>
+          <mat-date-range-input [rangePicker]="picker" [min]="minDate" [dateFilter]="weekdaysOnly">
+            <input matStartDate formControlName="start" placeholder="Start date" />
+            <input matEndDate formControlName="end" placeholder="End date" />
+          </mat-date-range-input>
+          <mat-hint>Weekends are not counted.</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker" />
+          <mat-date-range-picker #picker />
+          @if (form.controls.start.hasError('required') || form.controls.end.hasError('required')) {
+            <mat-error>Please choose a start and an end date</mat-error>
+          }
+        </mat-form-field>
+
+        @if (selectedDays() > 0) {
+          <p class="days-info">
+            <mat-icon>event_available</mat-icon>
+            {{ selectedDays() }} working {{ selectedDays() === 1 ? 'day' : 'days' }}
+          </p>
+        }
+
+        @if (form.hasError('overlap')) {
+          <p class="form-error" role="alert">You already have a request for some of these dates.</p>
+        }
+        @if (form.hasError('insufficientBalance')) {
+          <p class="form-error" role="alert">
+            Not enough annual leave. You have {{ balance()?.available }} days available.
+          </p>
+        }
+        @if (form.hasError('noWorkingDays')) {
+          <p class="form-error" role="alert">The selected dates contain no working days.</p>
+        }
+
+        <h3>Reason <span class="muted optional">(optional)</span></h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Add a note for your manager</mat-label>
+          <textarea matInput formControlName="reason" rows="3" maxlength="300"></textarea>
+          <mat-hint align="end">{{ form.controls.reason.value.length }} / 300</mat-hint>
+        </mat-form-field>
+
+        <div class="actions">
+          <a mat-button routerLink="/requests">Cancel</a>
+          <button mat-flat-button type="submit" [disabled]="form.invalid">
+            <mat-icon>send</mat-icon>
+            Submit request
+          </button>
+        </div>
+      </form>
+    </mat-card>
+
+    @if (balance(); as b) {
+      <mat-card appearance="outlined" class="balance-card">
+        <h3>Your annual leave ({{ minDate.getFullYear() }})</h3>
+        <dl>
+          <div><dt>Yearly allowance</dt><dd>{{ b.allowance }} days</dd></div>
+          <div><dt>Used</dt><dd>{{ b.used }} days</dd></div>
+          <div><dt>Pending approval</dt><dd>{{ b.pending }} days</dd></div>
+          <div class="total"><dt>Available</dt><dd>{{ b.available }} days</dd></div>
+        </dl>
+        @if (selectedType() === 'annual' && selectedDays() > 0) {
+          <p class="after">
+            After this request: <strong>{{ b.available - selectedDays() }} days</strong>
+          </p>
+        }
+      </mat-card>
+    }
+  </div>
+</div>

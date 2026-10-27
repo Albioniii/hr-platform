@@ -1,0 +1,41 @@
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+
+  .search {
+    flex: 1;
+    min-width: 240px;
+  }
+}
+
+.table-card {
+  background: var(--mat-sys-surface);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.person-name {
+  font-weight: 500;
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--mat-sys-surface-container);
+    outline: none;
+  }
+}

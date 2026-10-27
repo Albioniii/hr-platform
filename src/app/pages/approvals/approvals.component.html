@@ -1,0 +1,103 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Approvals</h1>
+      <p>Review leave requests from your team.</p>
+    </div>
+  </header>
+
+  <mat-tab-group animationDuration="150ms">
+    <mat-tab label="Pending ({{ pendingItems().length }})">
+      <div class="tab-body">
+        @for (item of pendingItems(); track item.request.id) {
+          <mat-card appearance="outlined" class="request-card">
+            <div class="request-head">
+              <app-avatar [employee]="item.employee" [size]="44" />
+              <div class="who">
+                <a class="name" [routerLink]="['/employees', item.employee.id]">
+                  {{ item.employee.firstName }} {{ item.employee.lastName }}
+                </a>
+                <span class="muted">{{ item.employee.position }} · {{ item.employee.department }}</span>
+              </div>
+              <span class="muted requested">Requested {{ item.request.createdAt | date: 'MMM d' }}</span>
+            </div>
+
+            <div class="details">
+              <div>
+                <span class="label">Type</span>
+                <span class="value">{{ item.request.type | leaveType }}</span>
+              </div>
+              <div>
+                <span class="label">Dates</span>
+                <span class="value">
+                  {{ item.request.startDate | date: 'EEE, MMM d' }} – {{ item.request.endDate | date: 'EEE, MMM d, y' }}
+                </span>
+              </div>
+              <div>
+                <span class="label">Working days</span>
+                <span class="value">{{ item.request.days }}</span>
+              </div>
+              @if (item.request.type === 'annual') {
+                <div>
+                  <span class="label">Balance after approval</span>
+                  <span class="value" [class.negative]="item.balance.remaining - item.request.days < 0">
+                    {{ item.balance.remaining - item.request.days }} / {{ item.balance.allowance }} days
+                  </span>
+                </div>
+              }
+            </div>
+
+            @if (item.request.reason) {
+              <p class="reason"><mat-icon>chat_bubble_outline</mat-icon> {{ item.request.reason }}</p>
+            }
+
+            @if (item.overlapping.length > 0) {
+              <p class="warning">
+                <mat-icon>warning_amber</mat-icon>
+                Also out at this time: {{ item.overlapping.join(', ') }}
+              </p>
+            }
+
+            <div class="actions">
+              <button mat-stroked-button (click)="reject(item)">
+                <mat-icon>close</mat-icon>
+                Reject
+              </button>
+              <button mat-flat-button (click)="approve(item)">
+                <mat-icon>check</mat-icon>
+                Approve
+              </button>
+            </div>
+          </mat-card>
+        } @empty {
+          <div class="empty-state">
+            <mat-icon>task_alt</mat-icon>
+            <p>All caught up! There are no requests waiting for you.</p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="History">
+      <div class="tab-body">
+        <mat-card appearance="outlined" class="history-card">
+          @for (item of history(); track item.request.id) {
+            <div class="history-row">
+              @if (item.employee; as e) {
+                <app-avatar [employee]="e" [size]="32" />
+                <span class="history-name">{{ e.firstName }} {{ e.lastName }}</span>
+              }
+              <span class="muted history-dates">
+                {{ item.request.type | leaveType }} · {{ item.request.startDate | date: 'MMM d' }} –
+                {{ item.request.endDate | date: 'MMM d' }}
+              </span>
+              <span class="status status-{{ item.request.status }}">{{ item.request.status }}</span>
+            </div>
+          } @empty {
+            <div class="empty-state"><p>No decisions yet.</p></div>
+          }
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

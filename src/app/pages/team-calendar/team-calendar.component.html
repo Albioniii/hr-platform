@@ -1,0 +1,86 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Team calendar</h1>
+      <p>See who is out of office and plan your leave around the team.</p>
+    </div>
+  </header>
+
+  <mat-card appearance="outlined" class="calendar-card">
+    <div class="toolbar">
+      <div class="month-nav">
+        <button mat-icon-button (click)="previousMonth()" aria-label="Previous month">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <h2>{{ month() | date: 'MMMM y' }}</h2>
+        <button mat-icon-button (click)="nextMonth()" aria-label="Next month">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button mat-stroked-button (click)="goToToday()">Today</button>
+      </div>
+
+      <div class="filters">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="dept-field">
+          <mat-label>Department</mat-label>
+          <mat-select [value]="department()" (selectionChange)="department.set($event.value)">
+            <mat-option value="all">All departments</mat-option>
+            @for (d of departments; track d) {
+              <mat-option [value]="d">{{ d }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-slide-toggle [checked]="showPending()" (change)="showPending.set($event.checked)">
+          Show pending
+        </mat-slide-toggle>
+      </div>
+    </div>
+
+    <div class="grid-scroll">
+      <div class="grid">
+        @for (name of weekdayNames; track name) {
+          <div class="weekday">{{ name }}</div>
+        }
+
+        @for (week of weeks(); track $index) {
+          @for (day of week; track day.iso) {
+            <div
+              class="day"
+              [class.outside]="!day.inMonth"
+              [class.weekend]="day.isWeekend"
+              [class.today]="day.isToday"
+            >
+              <span class="day-number">{{ day.date.getDate() }}</span>
+              <div class="entries">
+                @for (entry of day.entries; track entry.request.id) {
+                  <span
+                    class="entry"
+                    [class.pending]="entry.request.status === 'pending'"
+                    [style.--entry-color]="entry.employee.avatarColor"
+                    [matTooltip]="
+                      entry.employee.firstName +
+                      ' ' +
+                      entry.employee.lastName +
+                      ' · ' +
+                      (entry.request.type | leaveType) +
+                      ' (' +
+                      entry.request.status +
+                      ')'
+                    "
+                  >
+                    {{ entry.employee.firstName }} {{ entry.employee.lastName.charAt(0) }}.
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch approved"></span> Approved</span>
+      <span><span class="swatch pending"></span> Pending approval</span>
+      <span><span class="swatch today"></span> Today</span>
+    </div>
+  </mat-card>
+</div>
